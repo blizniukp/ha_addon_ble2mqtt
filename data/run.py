@@ -9,24 +9,32 @@ import time
 
 CONFIG_PATH = "/data/options.json"
 CONFIG = None
-
-dev_list = [
-	{
-		'name': 'Nordic_Blinky',
-		'address': 'F1:34:D5:DF:B8:3B',
-		'address_type': 'public',
-		'service_uuid': "00001523-1212-EFDE-1523-785FEABCD123",
-		'char_uuid': "00001524-1212-EFDE-1523-785FEABCD123"
-	}
-]
+DEV_LIST = None
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(funcName)s() - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
-def load_config():
-	with open(CONFIG_PATH) as file:
+def load_config(conf_path):
+	with open(conf_path) as file:
 		return json.load(file)
+
+
+def get_dev_list(conf):
+	devices = conf["devices"]
+	dlist = []
+	for device in devices:
+		logger.info("Create new device: {}".format((str(device))))
+		d = {
+			'name': device["name"],
+			'address': device["address"],
+			'address_type': device["address_type"],
+			'service_uuid': device["service_uuid"],
+			'char_uuid': device["char_uuid"]
+		}
+		dlist.append(d)
+		logger.info("Append new element to dlist: {}".format(str(dlist)))
+	return dlist
 
 
 def pub_message(mqttc, topic, payload):
@@ -43,7 +51,7 @@ def on_message(mqttc, obj, msg):
 	top = msg.topic.split('/')
 	logging.info("Command: {}".format(top[3]))
 	if top[3] == 'getDevList':
-		resp = json.dumps(dev_list)
+		resp = json.dumps(DEV_LIST)
 		pub_message(mqttc, "/ble2mqtt/dev/devList", resp)
 	if top[3] == 'value':
 		logging.info("Receive value from device: {}".format(str(msg.payload)))
@@ -62,12 +70,16 @@ def on_log(mqttc, obj, level, string):
 
 
 def main(argv):
+	global DEV_LIST
+	global CONFIG
 	logger.info("Start python script")
 
 	logger.info("Load configuration")
-	CONFIG = load_config()
+	CONFIG = load_config(CONFIG_PATH)
+	DEV_LIST = get_dev_list(CONFIG)
 
 	logger.info("Config: {}".format(str(CONFIG)))
+	logger.info("Device list: {}".format(str(DEV_LIST)))
 
 	mqttc = mqtt.Client()
 	mqttc.on_message = on_message
