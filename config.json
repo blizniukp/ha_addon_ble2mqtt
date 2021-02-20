@@ -1,0 +1,33 @@
+{
+  "name": "Bluetooth LE to MQTT",
+  "version": "0.0.1",
+  "slug": "ble2mqtt",
+  "description": "Bluetooth LE to Mqtt gateway",
+  "arch": ["armhf", "armv7", "amd64"],
+  "startup": "application",
+  "boot": "auto",
+  "options": {
+  	"address": "172.30.32.1",
+  	"port": 1883,
+  	"qos": 1,
+    "username": "mqttuser",
+    "password": "mqttpassword",
+    "interface": "hassio",
+    "anonymous": false,
+    "sub_topic": "/ble2mqtt/app/#",
+    "pub_topic": "/ble2mqtt/dev/",
+    "bledevices": []
+  },
+  "schema": {
+  	"address": "str",
+  	"port": "int",
+  	"qos": "int",
+    "username": "str",
+    "password": "str",
+    "interface": "str",
+    "anonymous": "bool",
+    "sub_topic": "str",
+    "pub_topic": "str",
+    "bledevices": [{ "name": "str", "address": "str", "address_type": "str", "service_uuid": "str", "char_uuid": "str"}]
+  }
+}
