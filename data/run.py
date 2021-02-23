@@ -25,6 +25,7 @@ def get_dev_list(conf):
 	dlist = []
 	for device in devices:
 		logger.info("Create new device: {}".format((str(device))))
+		device['device_id'] = device["name"].replace(':', '_')
 		d = {
 			'name': device["name"],
 			'address': device["address"],
@@ -35,6 +36,37 @@ def get_dev_list(conf):
 		dlist.append(d)
 		logger.info("Append new element to dlist: {}".format(str(dlist)))
 	return dlist
+
+
+def create_switches(mqttc, conf):
+	devices = conf["devices"]
+	for device in devices:
+		logger.info("Create new switch: {}".format((str(device))))
+		topic = "homeassistant/switch/{}/config".format(device['device_id'])
+		payload = {
+			"name": device["name"],
+			"unique_id": device['device_id'],
+			"command_topic": "homeassistant/switch/{}/set".format(device['device_id']),
+			"state_topic": "homeassistant/switch/{}/state".format(device['device_id'])
+		}
+		pub_message(mqttc, topic, json.dumps(payload))
+
+
+def pub_switch_status(mqttc, device, value):
+	topic = "homeassistant/switch/{}/state".format(device['device_id'])
+	payload = "ON" if int(value) == 1 else "OFF"
+	pub_message(mqttc, topic, str(payload))
+
+
+def pub_value(mqttc, payload):
+	"""b'{"address": "F1:34:D5:DF:B8:3B", "is_notify": True, "val_len": 1, "val": 00}'"""
+	global CONFIG
+	vinfo = json.loads(payload.decode('utf-8'))
+	devices = CONFIG["devices"]
+	for device in devices:
+		if device["address"] == vinfo["address"]:
+			pub_switch_status(mqttc, device, vinfo["val"])
+			return
 
 
 def pub_message(mqttc, topic, payload):
@@ -55,6 +87,7 @@ def on_message(mqttc, obj, msg):
 		pub_message(mqttc, "/ble2mqtt/dev/devList", resp)
 	if top[3] == 'value':
 		logging.info("Receive value from device: {}".format(str(msg.payload)))
+		pub_value(mqttc, msg.payload)
 
 
 def on_publish(mqttc, obj, mid):
@@ -81,7 +114,7 @@ def main(argv):
 	logger.info("Config: {}".format(str(CONFIG)))
 	logger.info("Device list: {}".format(str(DEV_LIST)))
 
-	mqttc = mqtt.Client()
+	mqttc = mqtt.Client("Ble2Mqtt", clean_session=True)
 	mqttc.on_message = on_message
 	mqttc.on_connect = on_connect
 	mqttc.on_publish = on_publish
@@ -93,6 +126,7 @@ def main(argv):
 
 	mqttc.subscribe(CONFIG['sub_topic'], CONFIG['qos'])
 
+	create_switches(mqttc, CONFIG)
 	mqttc.loop_forever()
 	logger.info("Stop python script")
 
