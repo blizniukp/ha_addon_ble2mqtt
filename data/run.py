@@ -52,6 +52,24 @@ def create_switches(mqttc, conf):
 		pub_message(mqttc, topic, json.dumps(payload))
 
 
+def create_triggers(mqttc, conf):
+	devices = conf["devices"]
+	for device in devices:
+		logger.info("Create new switch: {}".format((str(device))))
+		topic = "homeassistant/device_automation/{}/config".format(device['device_id'])
+		payload = {
+			"automation_type": "trigger",
+			"topic": "",
+			"type": "button_short_press",
+			"subtype": "button_1",
+			"device": {
+				"name": device["name"],
+				"identifiers": [device['device_id']]
+			}
+		}
+		pub_message(mqttc, topic, json.dumps(payload))
+
+
 def pub_switch_status(mqttc, device, value):
 	topic = "homeassistant/switch/{}/state".format(device['device_id'])
 	payload = "ON" if int(value) == 1 else "OFF"
@@ -127,6 +145,7 @@ def main(argv):
 	mqttc.subscribe(CONFIG['sub_topic'], CONFIG['qos'])
 
 	create_switches(mqttc, CONFIG)
+	#create_triggers(mqttc, CONFIG)
 	mqttc.loop_forever()
 	logger.info("Stop python script")
 
