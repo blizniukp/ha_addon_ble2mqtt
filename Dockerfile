@@ -3,11 +3,6 @@ FROM $BUILD_FROM
 
 ENV LANG C.UTF-8
 
-#RUN apk update
-#RUN apk add --no-cache jq python3
-#RUN apk add --no-cache py3-setuptools
-#RUN pip install paho-mqtt
-
 RUN apt-get update \
     && apt-get install -y \
     	python3 \
