@@ -1,5 +1,5 @@
 # Changelog
 
-## 0.0.1
+## 0.1.0
 
-- Connect to mqtt broker
+- First release
