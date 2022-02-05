@@ -1,14 +1,14 @@
 {
   "name": "Bluetooth LE to MQTT",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "slug": "ble2mqtt",
   "description": "Bluetooth LE to Mqtt gateway",
-  "arch": ["armhf", "armv7", "amd64"],
+  "arch": ["armhf", "armv7", "amd64", "aarch64", "i386"],
   "startup": "application",
   "host_network" : true,
   "boot": "auto",
   "options": {
-  	"address": "172.30.32.1",
+  	"address": "homeassistant",
   	"port": 1883,
   	"qos": 1,
     "username": "mqttuser",
@@ -28,11 +28,11 @@
     "sub_topic": "str",
     "pub_topic": "str",
     "devices": [
-    	{ 
-    		"name": "str", 
-    		"address": "str", 
-    		"address_type": "str", 
-    		"service_uuid": "str", 
+    	{
+    		"name": "str",
+    		"address": "str",
+    		"address_type": "str",
+    		"service_uuid": "str",
     		"char_uuid": "str"
     	}
     ]
