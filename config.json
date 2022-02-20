@@ -1,6 +1,6 @@
 {
   "name": "Bluetooth LE to MQTT",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "slug": "ble2mqtt",
   "description": "Bluetooth LE to Mqtt gateway",
   "arch": ["armhf", "armv7", "amd64", "aarch64", "i386"],

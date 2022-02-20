@@ -11,7 +11,7 @@ CONFIG = None
 DEV_LIST = None
 SWITCH_LIST = None
 MAX_BUTTON_PER_DEV = 6
-MAX_BUTTON_FUNCTIONS = 2
+MAX_BUTTON_FUNCTIONS = 3
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(funcName)s() - %(levelname)s - %(message)s')
@@ -71,9 +71,9 @@ def create_switches(mqttc, switches):
 		pub_message(mqttc, topic, json.dumps(payload))
 
 
-def pub_switch_status(mqttc, switch, func_no):
+def pub_switch_status(mqttc, switch, button_value):
 	topic = "homeassistant/switch/{}/state".format(switch['unique_id'])
-	payload = "OFF" if func_no == 0 else "ON"
+	payload = "OFF" if button_value == 0 else "ON"
 	pub_message(mqttc, topic, str(payload))
 
 
@@ -81,21 +81,16 @@ def parse_and_pub_value(mqttc, payload):
 	global SWITCH_LIST
 	vinfo = json.loads(payload.decode('utf-8'))
 	device_id = vinfo["address"].replace(':', '_')
-	button_no = int(vinfo["val"][:2])
-	func_no = int(vinfo["val"][2:4])
+	button_data = int(vinfo["val"][:2])
+	button_no = button_data // 10
+	func_no = button_data % 10
+	button_value = int(vinfo["val"][2:4])
 	unique_id = device_id + '_B' + str(button_no) + '_F' + str(func_no)
-	if func_no > 0:
-		for switch in SWITCH_LIST:
-			if str(switch["unique_id"]) == str(unique_id):
-				logger.info("Publish switch status. Switch: {}, value: {}".format(str(switch), str(func_no)))
-				pub_switch_status(mqttc, switch, func_no)
-				return
-	elif func_no == 0:
-		unique_id = device_id + '_B' + str(button_no) + '_F'
-		for switch in SWITCH_LIST:
-			if str(switch["unique_id"]).startswith(unique_id):
-				logger.info("Publish switch status. Switch: {}, value: {}".format(str(switch), str(func_no)))
-				pub_switch_status(mqttc, switch, func_no)
+	for switch in SWITCH_LIST:
+		if str(switch["unique_id"]) == str(unique_id):
+			logger.info("Publish switch status. Switch: {}, value: {}".format(str(switch), str(button_value)))
+			pub_switch_status(mqttc, switch, button_value)
+			return
 
 
 def pub_message(mqttc, topic, payload):
