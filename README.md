@@ -8,7 +8,7 @@ Add-on for [esp32_ble2mqtt](https://github.com/blizniukp/esp32_ble2mqtt) gateway
 
 You can use this add-on to support [esp32_ble2mqtt](https://github.com/blizniukp/esp32_ble2mqtt) gateway in Home Assistnat.
 
-The add-on creates 12 buttons for each device added to the configuration. 
+The add-on creates 18 buttons for each device added to the configuration. 
 
 [aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg

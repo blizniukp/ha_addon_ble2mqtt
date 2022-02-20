@@ -49,8 +49,8 @@ Wtyczka współpracuje z bramką dostępną na ESP32 [esp32_ble2mqtt](https://gi
 
 Służy do tworzenia przycisków `switch` w Home Assistant które są sterowane z urządzeń Bluetooth.
 
-Urządzenie RoundPad posiada 6 przycisków z których każdy może przesyłać informacje o pojedyńczym i podwójnym kliknięciu.
-Wobec powyższego wtyczka tworzy 12 przycisków (6 przycisków * 2 funkcjonalności).
+Urządzenie RoundPad posiada 6 przycisków z których każdy może przesyłać informacje o pojedyńczym, podwójnym kliknięciu oraz długim przytrzymaniu klawisza.
+Wobec powyższego wtyczka tworzy 18 przycisków (6 przycisków * 3 funkcjonalności).
 
 Nazwa każdego z przycisku składa się z nazwy urządzenia, numeru przycisku oraz rodzaju kliknięcia.
 
@@ -62,7 +62,8 @@ Przykłady:
     ROUND_PAD_2_B1_F1 << urządzenie o nazwie ROUND_PAD_2, przycisk 1, funkcja pojedyńczego kliknięcia
     
     ROUND_PAD_2_B4_F2 << urządzenie o nazwie ROUND_PAD_2, przycisk 4, funkcja podwójnego kliknięcia
-
+    
+    ROUND_PAD_2_B4_F3 << urządzenie o nazwie ROUND_PAD_2, przycisk 4, funkcja długiego naciśnięcia klawisza
 
 Natomiast nazwa encji zawiera adres MAC urządzenia (dwukropek zamieniony na znak podkreślenia), numer przycisku oraz rodzaj kliknięcia.
 
@@ -74,7 +75,8 @@ Przykłady:
     DF_E2_FB_80_50_3E_B1_F1 << urządzenie o adresie MAC DF:E2:FB:80:50:3E, przycisk 1, funkcja pojedyńczego kliknięcia 
                                                                                                       
     DF_E2_FB_80_50_3E_B4_F2 << urządzenie o adresie MAC DF:E2:FB:80:50:3E, przycisk 4, funkcja podwójnego kliknięcia   
-
+                                                                                                  
+    DF_E2_FB_80_50_3E_B4_F3 << urządzenie o adresie MAC DF:E2:FB:80:50:3E, przycisk 4, funkcja długiego naciśnięcia klawisza 
 
 Dane przesyłane z bramki ble2mqtt posiadają informację o adresie MAC urządzenia z którego zostały wysłane dane, a także dane przesłane z przycisku.
 
@@ -87,22 +89,24 @@ Wartość w 'val' zawiera dane dotyczące stanu urządzenia oraz stanu przycisk�
     D7   D6   D5   D4   D3   D2   D1   D0   << Numeracja bajtów
     02 | 02 | 00 | 00 | 00 | 00 | 00 | 00   << Dane przesłane z urządzenia
 
-W `D7` znajduje się informacja zawierająca numer naduszonego przycisku. 
+W `D7` znajduje się informacja zawierająca numer naduszonego przycisku oraz typ kliknięcia. 
 
 Możliwe wartości to: 
 
-    0x01 - Przycisk 1
-    0x02 - Przycisk 2
-    0x03 - Przycisk 3
-    0x04 - Przycisk 4
-    0x05 - Przycisk 5
-    0x06 - Przycisk 6
+    0x11 - Przycisk 1 / krótkie kliknięcie
+    0x12 - Przycisk 1 / podówujne kliknięcie
+    0x13 - Przycisk 1 / długie naciśnięcie
+    0x21 - Przycisk 2 / krótkie kliknięcie
+    0x22 - Przycisk 2 / podówujne kliknięcie
+    0x23 - Przycisk 2 / długie naciśnięcie
+    ...
+    0x61 - Przycisk 6 / krótkie kliknięcie
+    0x62 - Przycisk 6 / podówujne kliknięcie
+    0x63 - Przycisk 6 / długie naciśnięcie
 
 W `D6` znajduje się rodzaj kliknięcia/zdarzenia. 
 
 Możliwe wartości to:
 
     0x00 - Przycisk nie jest wduszony
-    0x01 - Pojedyncze naduszenie przycisku
-    0x02 - Podwójne naduszenie przycisku
-
+    0x01 - Przycisk jest wduszony

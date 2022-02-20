@@ -50,8 +50,8 @@ The add-on works with the [esp32_ble2mqtt](https://github.com/blizniukp/esp32_bl
 
 Used to create `switch` buttons in Home Assistant that are controlled from Bluetooth devices.
 
-The RoundPad device has 6 buttons, each of which can transmit single and double click information.
-Therefore, the add-on creates 12 buttons (6 buttons * 2 functionalities).
+The RoundPad has 6 buttons each capable of transmitting single, double click and long key press information.
+Therefore, the add-on creates 18 buttons (6 buttons * 3 functionalities).
 
 The name of each button consists of the device name, button number, and click type.
 
@@ -64,6 +64,7 @@ Examples:
     
     ROUND_PAD_2_B4_F2 << device named ROUND_PAD_2, button 4, double click type
 
+    ROUND_PAD_2_B4_F3 << device named ROUND_PAD_2, button 4, long click type
 
 The entity name, on the other hand, contains the MAC address of the device (colon replaced by an underscore character), the button number, and the click type.
 
@@ -75,7 +76,8 @@ Examples:
     DF_E2_FB_80_50_3E_B1_F1 << device with MAC address DF:E2:FB:80:50:3E, button 1, single click type
                                                                                                       
     DF_E2_FB_80_50_3E_B4_F2 << device with MAC address DF:E2:FB:80:50:3E, button 4, double click type  
-
+                                                                                                  
+    DF_E2_FB_80_50_3E_B4_F3 << device with MAC address DF:E2:FB:80:50:3E, button 4, long click type  
 
 The data sent from the ble2mqtt gateway has information about the MAC address of the device from which the data was sent, and the data sent from the button.
 
@@ -88,22 +90,24 @@ The value in 'val' contains data about the status of the device and the status o
     D7   D6   D5   D4   D3   D2   D1   D0   << Byte numbering
     02 | 02 | 00 | 00 | 00 | 00 | 00 | 00   << Data from the Roundpad
 
-In `D7` there is information containing the number of the button pressed. 
+In `D7` there is information containing the number of the button pressed and type of click.
 
 Possible values are:
 
-    0x01 - Button 1
-    0x02 - Button 2
-    0x03 - Button 3
-    0x04 - Button 4
-    0x05 - Button 5
-    0x06 - Button 6
+    0x11 - Button 1 / one click
+    0x12 - Button 1 / two clicks
+    0x13 - Button 1 / long click
+    0x21 - Button 2 / one click
+    0x22 - Button 2 / two clicks
+    0x23 - Button 2 / long click
+    ...
+    0x61 - Button 6 / one click
+    0x62 - Button 6 / two clicks
+    0x63 - Button 6 / long click
 
 In `D6` is the type of click/event. 
 
 Possible values are:
 
     0x00 - Button is not pressed
-    0x01 - Single button press
-    0x02 - Double button press
-
+    0x01 - Button is pressed
